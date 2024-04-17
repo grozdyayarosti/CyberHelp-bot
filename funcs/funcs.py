@@ -1,12 +1,21 @@
-from db_funcs import db_open_connect, get_key_words, db_close_connection
+import random
+import string
 
+print()
+# if __name__ == 'funcs.funcs':
+#     from funcs.db_funcs import get_key_words, db_close_connection
+# else:
+#     from db_funcs import get_key_words, db_close_connection
+from operator import itemgetter
 
-def key_word_search(text):
+def key_word_search(text, connection):
     # with open('key_words.txt', 'r', encoding='utf-8') as f:
     #     key_word_list = f.read().split()
-    connection = db_open_connect()
-    key_word_list = get_key_words(connection)
-    db_close_connection(connection)
+    # connection = db_open_connect()
+    query_list = connection.select_key_words()
+    key_word_list = []
+    for key_word in query_list:
+        key_word_list.append(str(key_word)[2:-3])
 
     actual_words = []
     word_list = text.split()
@@ -61,3 +70,45 @@ def word_comparison(word, key_word):
 
     return max_count/len(key_word)
 
+def get_question(actual_words, connection):
+    query_table = connection.select_question_table(actual_words)
+    question_table = []
+    for elem in query_table:
+        total = elem[0] / elem[1]
+        # if total > 0.6:
+        # elem_list = list(elem)
+        # elem_list.append(total)
+        # question_table.append(elem_list)
+        elem_list = list(elem)
+        elem_list.append(total)
+        question_table.append(elem_list)
+        # question_table.append(list(elem))
+
+    question_table.sort(key=lambda x: (x[3], x[1]))
+    question_table.reverse()
+    print(*question_table, sep='\n')
+    return None if len(question_table) == 0 else question_table[0][2]
+
+def get_articles(question, connection):
+    query_articles = connection.select_articles(question)
+    article_list = query_articles[0].split()
+    articles = ''
+    for i in range(len(article_list)):
+        articles += str(i+1) + '. ' + article_list[i] + '\n'
+    s = f'Вот что я нашёл:\n{articles}'
+    return s
+
+def get_password(password_type):
+    if password_type == 'easy password':
+        with open('./txt_files/passwords.txt', 'r') as f:
+            lines = f.readlines()
+        password = random.choice(lines).strip()
+    elif password_type == 'medium password':
+        length = random.randint(6, 8)
+        characters = string.ascii_letters + string.digits
+        password = ''.join(random.choice(characters) for _ in range(length))
+    elif password_type == 'hard password':
+        length = random.randint(9, 12)
+        characters = string.ascii_letters + string.digits + string.punctuation
+        password = ''.join(random.choice(characters) for _ in range(length))
+    return password
