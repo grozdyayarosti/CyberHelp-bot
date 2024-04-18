@@ -1,8 +1,8 @@
 import telebot
 from telebot import types
-from config.db_config import token
+from config.configs import token
 from funcs.db_funcs import DBConnection
-from funcs.funcs import get_question, get_articles, get_password
+from funcs.funcs import get_question, get_articles, get_password, get_url_info
 from funcs.funcs import key_word_search
 from markups import main_menu_markup, to_home_markup
 
@@ -36,6 +36,10 @@ def case_handling(message):
         bot.register_next_step_handler(message, topyc_sync)
     elif message.text == 'Генерация пароля':
         bot.register_next_step_handler(message, passwords_handling)
+    elif message.text == 'Проверка ссылок':
+        bot.send_message(message.chat.id, 'Отправьте ссылку, я её проверю', reply_markup=types.ReplyKeyboardRemove())
+        bot.register_next_step_handler(message, url_checking)
+
     elif message.text.lower() in ('hello', 'привет'):
         bot.send_message(message.chat.id, 'Да привет, привет')
         # bot.reply_to(message, f'Да привет, привет')
@@ -114,6 +118,17 @@ def passwords_handling(message):
     bot.send_message(message.chat.id,
                      f'Какой пароль сгенерировать?',
                      reply_markup=kb)
+
+def url_checking(message):
+    url = message.text
+    url = url.split('/')[2] if url[:4] == 'http' else url.split('/')[0]
+    wait_message = bot.send_message(
+        message.chat.id,
+        "Я изучаю ссылку.\nПожалуйста, подождите . . .",
+        parse_mode='HTML')
+    output = get_url_info(url)
+    bot.delete_message(message.chat.id, wait_message.id)
+    bot.send_message(message.chat.id, output, parse_mode='HTML')
 
 def on_click(message):
     bot.send_message(message.chat.id, f'{message.text}?')

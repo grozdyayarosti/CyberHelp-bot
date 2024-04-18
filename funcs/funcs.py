@@ -1,5 +1,9 @@
 import random
 import string
+from googletrans import Translator
+from domainreputation import Client
+
+from config.configs import api_key
 
 print()
 # if __name__ == 'funcs.funcs':
@@ -54,13 +58,6 @@ def word_comparison(word, key_word):
 
         count = 0
         correct_word = word[j:]
-
-        # if len(correct_word) < len(key_word):
-        #     check_length = len(correct_word)
-        #     compare_length = len(key_word)
-        # else:
-        #     check_length = len(key_word)
-        #     compare_length = len(correct_word)
         check_length = len(correct_word) if len(correct_word) < len(key_word) else len(key_word)
         for i in range(check_length):
             if correct_word[i] == key_word[i]:
@@ -112,3 +109,33 @@ def get_password(password_type):
         characters = string.ascii_letters + string.digits + string.punctuation
         password = ''.join(random.choice(characters) for _ in range(length))
     return password
+
+def get_url_info(url):
+    print(url)
+    try:
+        client = Client(api_key)
+        response = client.get(url)
+        response_dict = eval(str(response))
+        print(response_dict)
+        # 12cnd.1slo.pl excoder.club plantakiademexico.com mein-db-vorgang34.online
+
+        info_dict = {}
+        info_dict['<b>Скорость работы</b>'] = '- ' + translate(response_dict['mode'])
+        info_dict['<b>Репутация сайта</b>'] = f"- {response_dict['reputation_score']}/100"
+        l = eval(response_dict['test_results'])
+        for elem in l:
+            warns = ['\n- ' + warn for warn in eval(elem["warnings"])]
+            key = '<b>' + translate(elem["test"]) + '</b>'
+            value = translate("".join(warns))
+            info_dict[key] = value
+        output = ''
+        for k, v in info_dict.items():
+            output += f"{k}: \n{v}\n"
+    except:
+        output = 'Неверная ссылка!\nПопробуйте ещё раз.'
+    finally:
+        return output
+
+def translate(word):
+    result =  Translator().translate(word, dest = 'ru')
+    return result.text

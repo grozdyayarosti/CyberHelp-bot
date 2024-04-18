@@ -1,5 +1,5 @@
 import psycopg2
-from config.db_config import host, user, password, db_name, port
+from config.configs import host, user, password, db_name, port
 
 class DBConnection:
     def __init__(self):
