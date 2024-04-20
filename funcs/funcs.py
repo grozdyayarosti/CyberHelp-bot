@@ -99,15 +99,15 @@ def get_password(password_type):
     if password_type == 'easy password':
         with open('./txt_files/passwords.txt', 'r') as f:
             lines = f.readlines()
-        password = random.choice(lines).strip()
+        password = "Слабый пароль:  " + random.choice(lines).strip()
     elif password_type == 'medium password':
         length = random.randint(6, 8)
         characters = string.ascii_letters + string.digits
-        password = ''.join(random.choice(characters) for _ in range(length))
+        password = "Хороший пароль:  " + ''.join(random.choice(characters) for _ in range(length))
     elif password_type == 'hard password':
         length = random.randint(9, 12)
         characters = string.ascii_letters + string.digits + string.punctuation
-        password = ''.join(random.choice(characters) for _ in range(length))
+        password = "Сильный пароль:  " + ''.join(random.choice(characters) for _ in range(length))
     return password
 
 def get_url_info(url):
@@ -131,9 +131,11 @@ def get_url_info(url):
         output = ''
         for k, v in info_dict.items():
             output += f"{k}: \n{v}\n"
-    except:
+    except NameError as e:
+        print(e)
         output = 'Неверная ссылка!\nПопробуйте ещё раз.'
     finally:
+        print(output)
         return output
 
 def translate(word):

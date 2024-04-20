@@ -7,6 +7,6 @@ btn2 = types.KeyboardButton('Справка по безопасности')
 btn3 = types.KeyboardButton('Генерация пароля')
 main_menu_markup.row(btn1, btn2, btn3)
 
-to_home_markup = types.ReplyKeyboardMarkup(resize_keyboard=True) # Инициализация альтернативной клавиатуры
-to_home_btn = types.KeyboardButton('Вернуться к меню') # Добавление кнопки
-to_home_markup.row(to_home_btn)
+to_home_markup = types.InlineKeyboardMarkup(row_width=1) # Инициализация альтернативной клавиатуры
+to_home_btn = types.InlineKeyboardButton(text='Вернуться к меню', callback_data='to home') # Добавление кнопки
+to_home_markup.add(to_home_btn)
