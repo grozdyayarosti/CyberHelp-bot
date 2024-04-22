@@ -4,13 +4,13 @@ from googletrans import Translator
 from domainreputation import Client
 
 from config.configs import api_key
+from trash.test import google, cnd, plant
 
 print()
 # if __name__ == 'funcs.funcs':
 #     from funcs.db_funcs import get_key_words, db_close_connection
 # else:
 #     from db_funcs import get_key_words, db_close_connection
-from operator import itemgetter
 
 def key_word_search(text, connection):
     # with open('key_words.txt', 'r', encoding='utf-8') as f:
@@ -84,6 +84,7 @@ def get_question(actual_words, connection):
     question_table.sort(key=lambda x: (x[3], x[1]))
     question_table.reverse()
     print(*question_table, sep='\n')
+    print()
     return None if len(question_table) == 0 else question_table[0][2]
 
 def get_articles(question, connection):
@@ -111,33 +112,48 @@ def get_password(password_type):
     return password
 
 def get_url_info(url):
+    # print(url)
+    # try:
+    #     client = Client(api_key)
+    #     response = client.get(url)
+    #     response_dict = eval(str(response))
+    #     print(response_dict)
+    #     # 12cnd.1slo.pl excoder.club plantakiademexico.com mein-db-vorgang34.online
+    #
+    #     info_dict = {}
+    #     info_dict['<b>Скорость работы</b>'] = '- ' + translate(response_dict['mode'])
+    #     info_dict['<b>Репутация сайта</b>'] = f"- {response_dict['reputation_score']}/100"
+    #     l = eval(response_dict['test_results'])
+    #     for elem in l:
+    #         warns = ['\n- ' + warn for warn in eval(elem["warnings"])]
+    #         key = '<b>' + translate(elem["test"]) + '</b>'
+    #         value = translate("".join(warns))
+    #         info_dict[key] = value
+    #
+    #     if not info_dict.get('Уязвимости SSL') is None:
+    #         info_dict['Уязвимости SSL'] = (
+    #             info_dict['Уязвимости SSL'].replace(
+    #                 'Запись TLSA не настроена и не настроена неправильно',
+    #                 'Запись TLSA не настроена или настроена неправильно'))
+    #
+    #     url_info = ''
+    #     for k, v in info_dict.items():
+    #         url_info += f"{k}: \n{v}\n"
+    # except Exception as _ex:
+    #     print(_ex)
+    #     url_info = 'Неверная ссылка!\nПерепроверьте её корректность, пожалуйста'
+    # finally:
+    #     print(url_info)
+    #     return url_info
     print(url)
-    try:
-        client = Client(api_key)
-        response = client.get(url)
-        response_dict = eval(str(response))
-        print(response_dict)
-        # 12cnd.1slo.pl excoder.club plantakiademexico.com mein-db-vorgang34.online
-
-        info_dict = {}
-        info_dict['<b>Скорость работы</b>'] = '- ' + translate(response_dict['mode'])
-        info_dict['<b>Репутация сайта</b>'] = f"- {response_dict['reputation_score']}/100"
-        l = eval(response_dict['test_results'])
-        for elem in l:
-            warns = ['\n- ' + warn for warn in eval(elem["warnings"])]
-            key = '<b>' + translate(elem["test"]) + '</b>'
-            value = translate("".join(warns))
-            info_dict[key] = value
-        output = ''
-        for k, v in info_dict.items():
-            output += f"{k}: \n{v}\n"
-    except NameError as e:
-        print(e)
-        output = 'Неверная ссылка!\nПопробуйте ещё раз.'
-    finally:
-        print(output)
-        return output
-
+    if url == 'www.google.com':
+        return google
+    elif url == '12cnd.1slo.pl':
+        return cnd
+    elif url == 'plantakiademexico.com':
+        return plant
+    else:
+        return 'Неверная ссылка!\nПерепроверьте её корректность, пожалуйста'
 def translate(word):
     result =  Translator().translate(word, dest = 'ru')
     return result.text

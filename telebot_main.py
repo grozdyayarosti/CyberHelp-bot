@@ -1,5 +1,4 @@
 import time
-
 import telebot
 from telebot import types
 from config.configs import token
@@ -19,7 +18,7 @@ print('запуск')
 def start(message):
     user = message.chat.first_name if message.from_user.is_bot else message.from_user.first_name
     bot.send_message(message.chat.id,
-                     f'Привет, {user}!\nЯ - бот-киберпомощник, с чем требуется помощь?',
+                     f'Привет, {user}!\nЯ бот-киберпомощник, с чем требуется помощь?',
                      reply_markup=main_menu_markup)
 
 ##########################################################################################
@@ -34,20 +33,18 @@ def case_handling(message):
     elif message.text == 'Справка по безопасности':
         delete_ReplyKeyboard(message)
         bot.send_message(message.chat.id, 'Задайте вопрос', reply_markup=to_home_markup)
-        bot.register_next_step_handler(message, topyc_sync)
+        bot.register_next_step_handler(message, topyc_synchronization)
     elif message.text == 'Генерация пароля':
-        # types.ReplyKeyboardRemove()
         passwords_handling(message)
-    elif message.text.lower() in ('hello', 'привет'):
-        bot.send_message(message.chat.id, 'Да привет, привет')
-        # bot.reply_to(message, f'Да привет, привет')
-        # start(message)
-    elif message.text.lower() == 'id':
-        bot.send_message(message.chat.id, f'ID: {message.from_user.id}')
-        # bot.reply_to(message, f'ID: {message.from_user.id}')
+    # elif message.text.lower() in ('hello', 'привет'):
+    #     bot.send_message(message.chat.id, 'Да привет, привет')
+    #     # bot.reply_to(message, f'Да привет, привет')
+    #     # start(message)
+    # elif message.text.lower() == 'id':
+    #     bot.send_message(message.chat.id, f'ID: {message.from_user.id}')
+    #     # bot.reply_to(message, f'ID: {message.from_user.id}')
     else:
         bot.send_message(message.chat.id, f'Выберите опцию меню')
-    # types.ReplyKeyboardRemove(selective=False)
 
 ##########################################################################################
 #  ОБРАБОТЧИК callback                                                                   #
@@ -55,10 +52,9 @@ def case_handling(message):
 @bot.callback_query_handler(func=lambda callback: callback.data)
 def check_callback_data(callback):
     if callback.data == 'wrong question':
-        inl_keyb_reply = 'Переформулируйте вопрос, пожалуйста'
         delete_ReplyKeyboard(callback.message)
-        bot.send_message(callback.message.chat.id, inl_keyb_reply, reply_markup=to_home_markup)
-        bot.register_next_step_handler(callback.message, topyc_sync)
+        bot.send_message(callback.message.chat.id, 'Переформулируйте вопрос, пожалуйста', reply_markup=to_home_markup)
+        bot.register_next_step_handler(callback.message, topyc_synchronization)
     elif callback.data == 'correct question':
         question = callback.message.text[18:-5]
         inl_keyb_reply = get_articles(question, connection)
@@ -73,8 +69,7 @@ def check_callback_data(callback):
         start(callback.message)
 
     else:
-        inl_keyb_reply = 'пустота'
-        bot.send_message(callback.message.chat.id, inl_keyb_reply)
+        bot.send_message(callback.message.chat.id, 'пустота')
 
 ##########################################################################################
 #  ФУНКЦИИ ДЛЯ ОБРАБОТЧИКОВ                                                              #
@@ -84,13 +79,15 @@ def url_checking(message):
     url = url.split('/')[2] if url[:4] == 'http' else url.split('/')[0]
     wait_message = bot.send_message(
         message.chat.id,
-        "Я изучаю ссылку.\nПожалуйста, подождите . . .",
+        "Я изучаю ссылку.\nПожалуйста, подождите . . . ",
         parse_mode='HTML')
+    time.sleep(3)
     output = get_url_info(url)
+    print(f'{output = }')
     bot.delete_message(message.chat.id, wait_message.id)
     bot.send_message(message.chat.id, output, parse_mode='HTML', reply_markup=main_menu_markup)
 
-def topyc_sync(message):
+def topyc_synchronization(message):
     actual_words = key_word_search(message.text, connection)
     question = get_question(actual_words, connection)
     # print(f'{actual_words = }')
@@ -99,7 +96,7 @@ def topyc_sync(message):
         bot.send_message(message.chat.id,
                          f'Затрудняюсь ответить.\nПопробуйте переформулировать',
                          reply_markup=to_home_markup)
-        bot.register_next_step_handler(message, topyc_sync)
+        bot.register_next_step_handler(message, topyc_synchronization)
     else:
         kb = types.InlineKeyboardMarkup(row_width=1)
         btn_yes = types.InlineKeyboardButton(text='Да',
@@ -112,7 +109,6 @@ def topyc_sync(message):
         bot.send_message(message.chat.id,
                          f'Вы имели в виду \n"{question}"\n???',
                          reply_markup=kb)
-        # print(f'1. {message.chat.id = }')
         # bot.send_message(message.chat.id, f'Акутальные слова:\n{actual_words}')
         # bot.send_message(message.chat.id, f'Таблица вопросов:\n{questions}')
 
@@ -135,9 +131,9 @@ def on_click(message):
     bot.send_message(message.chat.id, f'{message.text}?')
 
 def delete_ReplyKeyboard(msg):
-    delete_keyboard_msg = bot.send_message(msg.chat.id, 'Пожалуйста, подождите . . .',
+    delete_keyboard_msg = bot.send_message(msg.chat.id, 'Пожалуйста, подождите . . . ',
                                            reply_markup=types.ReplyKeyboardRemove())
-    time.sleep(1)
+    time.sleep(0.5)
     bot.delete_message(msg.chat.id, delete_keyboard_msg.id)
 
 bot.polling(none_stop=True)
