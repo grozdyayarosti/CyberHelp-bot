@@ -1,7 +1,6 @@
 from telebot import types
 
 main_menu_markup = types.ReplyKeyboardMarkup(resize_keyboard=True) # Инициализация альтернативной клавиатуры
-# TODO добавить one_time_keyboard=True в аргументы выше
 btn1 = types.KeyboardButton('Проверка ссылок') # Добавление кнопки
 btn2 = types.KeyboardButton('Справка по безопасности')
 btn3 = types.KeyboardButton('Генерация пароля')

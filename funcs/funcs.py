@@ -112,48 +112,40 @@ def get_password(password_type):
     return password
 
 def get_url_info(url):
-    # print(url)
-    # try:
-    #     client = Client(api_key)
-    #     response = client.get(url)
-    #     response_dict = eval(str(response))
-    #     print(response_dict)
-    #     # 12cnd.1slo.pl excoder.club plantakiademexico.com mein-db-vorgang34.online
-    #
-    #     info_dict = {}
-    #     info_dict['<b>Скорость работы</b>'] = '- ' + translate(response_dict['mode'])
-    #     info_dict['<b>Репутация сайта</b>'] = f"- {response_dict['reputation_score']}/100"
-    #     l = eval(response_dict['test_results'])
-    #     for elem in l:
-    #         warns = ['\n- ' + warn for warn in eval(elem["warnings"])]
-    #         key = '<b>' + translate(elem["test"]) + '</b>'
-    #         value = translate("".join(warns))
-    #         info_dict[key] = value
-    #
-    #     if not info_dict.get('Уязвимости SSL') is None:
-    #         info_dict['Уязвимости SSL'] = (
-    #             info_dict['Уязвимости SSL'].replace(
-    #                 'Запись TLSA не настроена и не настроена неправильно',
-    #                 'Запись TLSA не настроена или настроена неправильно'))
-    #
-    #     url_info = ''
-    #     for k, v in info_dict.items():
-    #         url_info += f"{k}: \n{v}\n"
-    # except Exception as _ex:
-    #     print(_ex)
-    #     url_info = 'Неверная ссылка!\nПерепроверьте её корректность, пожалуйста'
-    # finally:
-    #     print(url_info)
-    #     return url_info
     print(url)
-    if url == 'www.google.com':
-        return google
-    elif url == '12cnd.1slo.pl':
-        return cnd
-    elif url == 'plantakiademexico.com':
-        return plant
-    else:
-        return 'Неверная ссылка!\nПерепроверьте её корректность, пожалуйста'
+    try:
+        client = Client(api_key)
+        response = client.get(url)
+        response_dict = eval(str(response))
+        print(response_dict)
+        # 12cnd.1slo.pl excoder.club plantakiademexico.com mein-db-vorgang34.online
+
+        info_dict = {}
+        info_dict['<b>Скорость работы</b>'] = '- ' + translate(response_dict['mode'])
+        info_dict['<b>Репутация сайта</b>'] = f"- {response_dict['reputation_score']}/100"
+        l = eval(response_dict['test_results'])
+        for elem in l:
+            warns = ['\n- ' + warn for warn in eval(elem["warnings"])]
+            key = '<b>' + translate(elem["test"]) + '</b>'
+            value = translate("".join(warns))
+            info_dict[key] = value
+
+        if not info_dict.get('Уязвимости SSL') is None:
+            info_dict['Уязвимости SSL'] = (
+                info_dict['Уязвимости SSL'].replace(
+                    'Запись TLSA не настроена и не настроена неправильно',
+                    'Запись TLSA не настроена или настроена неправильно'))
+
+        url_info = ''
+        for k, v in info_dict.items():
+            url_info += f"{k}: \n{v}\n"
+    except Exception as _ex:
+        print(_ex)
+        url_info = 'Неверная ссылка!\nПерепроверьте её корректность, пожалуйста'
+    finally:
+        print(url_info)
+        return url_info
+
 def translate(word):
     result =  Translator().translate(word, dest = 'ru')
     return result.text

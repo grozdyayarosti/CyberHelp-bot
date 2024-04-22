@@ -81,7 +81,6 @@ def url_checking(message):
         message.chat.id,
         "Я изучаю ссылку.\nПожалуйста, подождите . . . ",
         parse_mode='HTML')
-    time.sleep(3)
     output = get_url_info(url)
     print(f'{output = }')
     bot.delete_message(message.chat.id, wait_message.id)
